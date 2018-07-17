@@ -1,0 +1,54 @@
+<!-- Username form -->
+            {% if not session['username'] %}
+            <div class="row">
+                <div class="col-12">
+                    <form id="username-form">
+                        <div class="form-group">
+                            <label for="username">Pick an Alias</label>
+                            <input type="text" class="form-control" name="username" placeholder="Enter chat handle" id="txt-username">
+                        </div>
+                        <button type="submit" class="btn btn-primary" id="btn-username">Start Chatting</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Main chat section -->
+            {% else %}
+            <div class="row" id="div-chat">
+                <div class="col-3">
+                    <!-- Channel list -->
+                        <div class="list-group">
+                            <a href="#" class="list-group-item list-group-item-action active">Cras justo odio</a>
+                            <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
+                            <a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
+                            <a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
+                            <a href="#" class="list-group-item list-group-item-action disabled">Vestibulum at eros</a>
+                        </div>
+
+                    <!-- Create new channel -->
+                    <form id="new-channel">
+                        <input type="text" class="form-control" name="new-channel-name" placeholder="Enter new channel name">
+                        <button type="submit" class="btn btn-primary btn-create-channel">Create Channel</button>
+                    </form>
+                </div>
+
+                <div class="col-9">
+                    <!-- Chat -->
+                    <div class="row">
+                        <div class="col-9" id="chat">chatroom</div>
+                    </div>
+
+                    <!-- Chat input -->
+                    <div class="row">
+                        <div class="col-9">
+                            <form class="form-inline" id="chat-input">
+                                <input type="text" class="form-control" name="chat-input" placeholder="Chat here" id="chat-textfield">
+                                <button type="submit" class="btn btn-primary btn-chat">Chat</button>
+                            </form>
+                            <button type="submit" class="btn btn-primary btn-change" id="btn-change">Change Name</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% endif %}

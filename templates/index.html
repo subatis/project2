@@ -9,53 +9,91 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
         <!-- My stylesheet -->
-        <link rel="stylesheet" href="styles.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 
         <!-- My javascript -->
-        <script src="chat.js"></script>
+        <script src="{{ url_for('static', filename='chat.js') }}"></script>
 
         <title>Chat</title>
     </head>
+
     <body>
         <div class="container-fluid">
 
+            <!-- Header -->
             <div class="row">
-                <div class="col-12">
-                    <!-- Header/Nav here-->
+                <div class="col-8 no-space">
+                    <img src="{{ url_for('static', filename='banner.jpg') }}" class="img-fluid" id="banner"></img>
                 </div>
+                <div class="col-4 no-space" id="banner-gradient"></div>
             </div>
 
+            <!-- DEBUG -->
             <div class="row">
                 <div class="col-12">
-
-                    <!-- Channel list -->
-                    <div class="list-group">
-                        <a href="#" class="list-group-item list-group-item-action active">Cras justo odio</a>
-                        <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
-                        <a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
-                        <a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
-                        <a href="#" class="list-group-item list-group-item-action disabled">Vestibulum at eros</a>
-                    </div>
-
-                    <!-- Create new channel -->
-                    <form id="new-channel">
-                        <input type="text" class="form-control" name="new-channel-name" placeholder="Enter new channel name">
-                        <button type="submit" class="btn btn-primary">Create Channel</button>
-                    </form>
+                    <h1>Welcome<a id="username-display"></a></h1>
                 </div>
             </div>
+            <!-- ----- -->
 
+            <div class="page"></div>
+
+            <!-- Username form -->
             <div class="row">
                 <div class="col-12">
-
-                    <!-- Pick username -->
-                    <form id="pick-username">
+                    <form id="username-form">
                         <div class="form-group">
                             <label for="username">Pick an Alias</label>
-                            <input type="text" class="form-control" name="username" placeholder="Enter chat handle">
+                            <input type="text" class="form-control" name="username" placeholder="Enter chat handle" id="txt-username">
                         </div>
-                        <button type="submit" class="btn btn-primary">Start Chatting</button>
+                        <button type="submit" class="btn btn-primary" id="btn-username">Start Chatting</button>
                     </form>
+                </div>
+            </div>
+
+            <!-- Main chat section -->
+            <div class="row" id="div-chat">
+                <div class="col-3">
+                    <!-- Channel list -->
+                        <div class="list-group">
+                            <a class="list-group-item list-group-item-dark">Channels</a>
+                            <div id="channel-list">
+                                <a href="#" class="list-group-item list-group-item-action">Dapibus ac facilisis in</a>
+                                <a href="#" class="list-group-item list-group-item-action">Morbi leo risus</a>
+                                <a href="#" class="list-group-item list-group-item-action">Porta ac consectetur ac</a>
+                                <a href="#" class="list-group-item list-group-item-action disabled">Vestibulum at eros</a>
+                            </div>
+                        </div>
+
+                    <!-- Create new channel -->
+                    <form id="new-channel-form">
+                        <input type="text" class="form-control" name="new-channel-name" placeholder="Enter new channel name" id="txt-new-channel">
+                        <button type="submit" class="btn btn-primary btn-create-channel">Create Channel</button>
+                    </form>
+                </div>
+
+                <div class="col-9">
+                    <!-- Chat -->
+                    <div class="row">
+                        <div class="col-9" id="chat">chatroom</div>
+                    </div>
+
+                    <!-- Chat input -->
+                    <div class="row">
+                        <div class="col-9">
+                            <form class="form-inline" id="chat-input">
+                                <input type="text" class="form-control" name="chat-input" placeholder="Chat here" id="chat-textfield">
+                                <button type="submit" class="btn btn-primary btn-chat">Chat</button>
+                            </form>
+                            <button type="submit" class="btn btn-primary btn-change" id="btn-change">Change Name</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-12">
+                    <!-- Footer here-->
                 </div>
             </div>
 

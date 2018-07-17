@@ -1,0 +1,40 @@
+/* Ensure banners span whole page */
+.container-fluid
+{
+    padding: 0px;
+}
+
+.no-space
+{
+    padding: 0px;
+    margin: 0px;
+}
+
+/* Header */
+
+#banner-gradient
+{
+    background: linear-gradient(to right, black , maroon);
+}
+
+#username-form
+{
+    margin-right: 2em;
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
+/* Channel sidebar */
+
+.btn-create-channel
+{
+    width: 100%;
+}
+
+/* Chat input */
+#chat-textfield
+{
+    width: 90% !important;
+}
+
+
