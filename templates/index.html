@@ -11,8 +11,20 @@
         <!-- My stylesheet -->
         <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
 
+        <!-- Handlebars -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
+
         <!-- My javascript -->
         <script src="{{ url_for('static', filename='chat.js') }}"></script>
+
+        <!-- Handlebars Templates -->
+        <script type="text/template" id="chat-message">
+
+        </script>
+
+        <script type="text/template" id="channel-list-item">
+
+        </script>
 
         <title>Chat</title>
     </head>
@@ -28,24 +40,19 @@
                 <div class="col-4 no-space" id="banner-gradient"></div>
             </div>
 
-            <!-- DEBUG -->
+            <!-- Welcome, username -->
             <div class="row">
                 <div class="col-12">
                     <h1>Welcome<a id="username-display"></a></h1>
                 </div>
             </div>
-            <!-- ----- -->
-
-            <div class="page"></div>
 
             <!-- Username form -->
             <div class="row">
                 <div class="col-12">
                     <form id="username-form">
-                        <div class="form-group">
-                            <label for="username">Pick an Alias</label>
-                            <input type="text" class="form-control" name="username" placeholder="Enter chat handle" id="txt-username">
-                        </div>
+                        <label for="username">Pick an Alias</label>
+                        <input type="text" class="form-control" name="username" placeholder="Enter chat handle" id="txt-username">
                         <button type="submit" class="btn btn-primary" id="btn-username">Start Chatting</button>
                     </form>
                 </div>
@@ -85,8 +92,8 @@
                     <!-- Chat input -->
                     <div class="row">
                         <div class="col-9">
-                            <form class="form-inline" id="chat-input">
-                                <input type="text" class="form-control" name="chat-input" placeholder="Chat here" id="chat-textfield">
+                            <form class="form-inline" id="chat-input-form">
+                                <input type="text" class="form-control" name="chat-input" placeholder="Chat here" id="txt-chat-input">
                                 <button type="submit" class="btn btn-primary btn-chat">Chat</button>
                             </form>
                             <button type="submit" class="btn btn-primary btn-change" id="btn-change">Change Name</button>
