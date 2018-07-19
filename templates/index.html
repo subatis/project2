@@ -61,32 +61,26 @@
 
             <!-- Header -->
             <div class="row">
-                <div class="col-8 no-space">
+                <div class="col-6 no-space">
                     <img src="{{ url_for('static', filename='banner.jpg') }}" class="img-fluid" id="banner"></img>
                 </div>
-                <div class="col-4 no-space" id="banner-gradient"></div>
+                <div class="col-6 no-space" id="banner-gradient">
+                    <form class="form-inline" id="username-form">
+                        <input type="text" class="form-control-sm" name="username" placeholder="Enter chat handle" id="txt-username">
+                        <button type="submit" class="btn btn-primary btn-sm" id="btn-username">Start Chatting</button>
+                    </form>
+                </div>
             </div>
 
             <!-- Welcome, username -->
             <div class="row">
                 <div class="col-12">
-                    <h1>Welcome<a id="username-display"></a></h1>
-                </div>
-            </div>
-
-            <!-- Username form -->
-            <div class="row">
-                <div class="col-12">
-                    <form id="username-form">
-                        <label for="username">Pick an Alias</label>
-                        <input type="text" class="form-control" name="username" placeholder="Enter chat handle" id="txt-username">
-                        <button type="submit" class="btn btn-primary" id="btn-username">Start Chatting</button>
-                    </form>
+                    <h5>You are chatting as <a id="username-display"></a> in channel <a id="channel-display"></a></h5>
                 </div>
             </div>
 
             <!-- Main chat section -->
-            <div class="row" id="div-chat">
+            <div class="row" id="main-page-body">
                 <div class="col-3">
                     <!-- Channel list -->
                         <div class="list-group">
@@ -109,7 +103,6 @@
                     <!-- Chat -->
                     <div class="row">
                         <div class="col-9">
-                            <h2 id="channel-display">Channel name</h2>
                             <div id="chat">
                                 <!-- Chat displayed here -->
                             </div>
@@ -125,12 +118,6 @@
                             </form>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="row">
-                <div class="col-12">
-                    <!-- Footer here-->
                 </div>
             </div>
 

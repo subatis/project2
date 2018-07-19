@@ -15,13 +15,16 @@
 #banner-gradient
 {
     background: linear-gradient(to right, black , maroon);
+    display: flex;
+    align-items: center;
 }
 
-#username-form
+/* Main page container */
+
+#main-page-body
 {
-    margin-right: 2em;
-    margin-top: 2em;
-    margin-bottom: 2em;
+  height: 800px;
+  background-image: url("background.png");
 }
 
 /* Channel sidebar */
@@ -32,6 +35,7 @@
 }
 
 /* Chat input */
+
 #chat-textfield
 {
     width: 90% !important;

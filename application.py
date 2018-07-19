@@ -9,8 +9,8 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
-# Username set (to avoid duplicate usernames)
-usernames = set()
+# Username dictionary - Usernames are unique keys paired with the users session.sid from socketio
+usernames = {}
 
 # Channel list - add general channel by default
 # KEYS/VALUES - channel names/lists of messages in each channel
@@ -56,15 +56,21 @@ def create_channel(data):
 
     emit("channel_created", list(channel_list.keys()), broadcast=True)
 
-# Set username and check for duplicates
+# Remove a username on disconnect
+@socketio.on("disconnect_user")
+def disconnect_user(data):
+    del usernames[data["username"]]
+
+# Set username with session id and check for duplicates
 @app.route("/set_username", methods=["POST"])
 def set_username():
     new_username = request.form.get("username")
+    sid = request.form.get("sid")
 
-    if new_username in usernames:
+    if new_username in usernames and usernames["new_username"] != sid:
         return "Duplicate"
 
-    usernames.add(new_username)
+    usernames["new_username"] = sid
     return "Success"
 
 # Get chat data for requested (current) channel

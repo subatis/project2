@@ -25,7 +25,7 @@ function showChannels(channels) {
     // Set change channel functionality for each list item (e.g. to update channel display)
     document.querySelectorAll('.list-group-item-action').forEach(function(channel) {
         channel.onclick = function() {
-            // Clear chat area and set current channel to selection
+            // Refresh chat area with selected channel on click
             document.querySelector('#chat').innerHTML = '';
             var newChannel = this.id.replace('channel-list-item-', '');
             localStorage.setItem('current_channel', newChannel);
@@ -37,22 +37,35 @@ function showChannels(channels) {
     });
 }
 
-// Builds HTML & renders ALL messages in a channel (for changing channels/loading page)
-// @param chatData an array of chat message dictionaries as parameter from Flask
-function showChat(chatData) {
+// Display current channel chat in its entirety (e.g. refresh entire chat when changing channels or loading page)
+function showCurrentChannelChat() {
     // Set channel name (title)
     document.querySelector('#channel-display').innerHTML = localStorage.getItem('current_channel');
 
-    // Build HTML from chat data using Handlebars template
-    let chats = '';
-    for (var i = 0; i < chatData.length; ++i) {
-        const newMessage = MESSAGE_TEMPLATE({ 'username': chatData[i].username, 'message': chatData[i].message,
-                                                'timestamp': chatData[i].timestamp});
-        chats += newMessage;
-    }
+    const requestChats = new XMLHttpRequest();
 
-    // Update page
-    document.querySelector('#chat').innerHTML = chats;
+    requestChats.open('POST', '/get_chats');
+    requestChats.onload = () => {
+        const data = JSON.parse(requestChats.responseText);
+
+        // Set channel name (title)
+        document.querySelector('#channel-display').innerHTML = localStorage.getItem('current_channel');
+
+        // Build HTML from chat data using Handlebars template
+        let chats = '';
+        for (var i = 0; i < data.length; ++i) {
+            const newMessage = MESSAGE_TEMPLATE({ 'username': data[i].username, 'message': data[i].message,
+                                                    'timestamp': data[i].timestamp});
+            chats += newMessage;
+        }
+
+        // Update page
+        document.querySelector('#chat').innerHTML = chats;
+    };
+
+    const currentChannel = new FormData();
+    currentChannel.append('current_channel', localStorage.getItem('current_channel'));
+    requestChats.send(currentChannel);
 }
 
 // Builds HTML & renders one chat at a time, when sending/receiving messages in a given channel
@@ -68,22 +81,32 @@ function appendChat(chatMessage) {
     }
 }
 
-// Display current channel chat, when page is loaded or channel is changed
-function showCurrentChannelChat() {
-    // Set channel name (title)
-    document.querySelector('#channel-display').innerHTML = localStorage.getItem('current_channel');
+// Set Username
+function setUsername(username) {
+        // Start and send new AJAX request with username data
+        const request = new XMLHttpRequest();
+        request.open('POST', '/set_username');
 
-    const requestChats = new XMLHttpRequest();
+        request.onload = () => {
+            // Check for duplicates
+            if (request.responseText === 'Duplicate') {
+                alert('Sorry, this username is already taken');
 
-    requestChats.open('POST', '/get_chats');
-    requestChats.onload = () => {
-        const data = JSON.parse(requestChats.responseText);
-        showChat(data);
-    };
+                // Remove from local storage if this is a relic from a previous visit and the username has since been taken
+                if (localStorage.getItem('username'))
+                    localStorage.removeItem('username');
+            }
+            // If successful, set local storage
+            else {
+                localStorage.setItem('username', username);
+                document.querySelector('#username-display').innerHTML = `${username}`;
+            }
+        };
 
-    const currentChannel = new FormData();
-    currentChannel.append('current_channel', localStorage.getItem('current_channel'));
-    requestChats.send(currentChannel);
+        const data = new FormData();
+        data.append('username', username);
+        data.append('sid', localStorage.getItem('sid'));
+        request.send(data);
 }
 
 // *****************************************************************************************************************************
@@ -91,6 +114,10 @@ function showCurrentChannelChat() {
 // *****************************************************************************************************************************
 
 document.addEventListener('DOMContentLoaded', () => {
+
+    // Generate random ID for this session if we don't already have one
+    if (!localStorage.getItem('sid'))
+        localStorage.setItem('sid', 'i' + Math.random().toString(16).slice(2));
 
     // *****************************************************************************************************************************
     // ***** WEB SOCKET ON/EMITS    ************************************************************************************************
@@ -119,6 +146,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         };
 
+        /* TODO
+        // On disconnect, update user list on Flask (e.g. to free up username), if username is set in local storage
+        socket.on('disconnect', () => {
+            if (localStorage.getItem('username'))
+                socket.emit('disconnect_user', {'username': localStorage.getItem('username')});
+        });*/
+
     });
 
     // Listen for changes to channel list
@@ -135,28 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Set username
     document.querySelector('#username-form').onsubmit = () => {
         username = document.querySelector('#txt-username').value;
-
-        // Start and send new AJAX request with username data
-        const request = new XMLHttpRequest();
-        request.open('POST', '/set_username');
-
-        request.onload = () => {
-            document.querySelector('#username-display').innerHTML = `, ${username}`;
-
-            // Check for duplicates
-            if (request.responseText === 'Duplicate') {
-                alert('Sorry, this username is already taken');
-            }
-            // If successful, set local storage
-            else {
-                localStorage.setItem('username', username);
-            }
-
-        };
-
-        const data = new FormData();
-        data.append('username', username);
-        request.send(data);
+        setUsername(username);
 
         return false;
     };
@@ -165,9 +178,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // ***** INITIAL DISPLAY    ****************************************************************************************************
     // *****************************************************************************************************************************
 
-    // Show username if it exists
+    // If a username is stored from previous session, check that it is still available and set accordingly (if same user)
     if (localStorage.getItem('username')) {
-        document.querySelector('#username-display').innerHTML = `, ${localStorage.getItem('username')}`;
+        //document.querySelector('#username-display').innerHTML = `${localStorage.getItem('username')}`;
+        setUsername(localStorage.getItem('username'));
     }
 
     // Get and display current channels & chat

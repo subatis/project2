@@ -8,12 +8,11 @@
 
 /* Header */
 #banner-gradient {
-  background: linear-gradient(to right, black, maroon); }
+  background: linear-gradient(to right, black, maroon);
+  display: flex;
+  align-items: center;
+}
 
-#username-form {
-  margin-right: 2em;
-  margin-top: 2em;
-  margin-bottom: 2em; }
 
 /* Channel sidebar */
 .btn-create-channel {
@@ -22,6 +21,11 @@
 /* Chat input */
 #chat-textfield {
   width: 90% !important; }
+
+#main-page-body {
+  height: 800px;
+  background-image: url("background.png");
+}
 
 
 /*# sourceMappingURL=styles.css.map */
