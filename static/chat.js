@@ -1,8 +1,15 @@
 // *****************************************************************************************************************************
+// ***** HANDLEBARS TEMPLATES    ***********************************************************************************************
+// *****************************************************************************************************************************
+
+const MESSAGE_TEMPLATE = Handlebars.compile(document.querySelector('#template-chat-message').innerHTML);
+
+// *****************************************************************************************************************************
 // ***** FUNCTION DEFINITIONS    ***********************************************************************************************
 // *****************************************************************************************************************************
 
 // Display channels
+// @param channels An array of channel names from Flask (list of dictionary keys)
 function showChannels(channels) {
     let channelList = '';
 
@@ -37,21 +44,28 @@ function showChannels(channels) {
     });
 }
 
-// Show channel chat
+// Show ALL channel chat when loading page or changing channels
+// @param chatData an array of chat message dictionaries as parameter from Flask
 function showChat(chatData) {
+    // Set channel name (title)
     document.querySelector('#channel-display').innerHTML = localStorage.getItem('current_channel');
 
+    // Build HTML from chat data using Handlebars template
     let chats = '';
-
-    for (var i = 0; i < chatData.length; ++i) {
-        chats += '<div class="card"><div class="card-header">';
-        chats += chatData[i].username;
-        chats += ' says: </div><div class="card-body">'
-        chats += chatData[i].message;
-        chats += '</div></div>';
+    for (var i = chataData.length; i < chatData.length; ++i) {
+        const newMessage = MESSAGE_TEMPLATE({'username': chatData[i].username, 'message': chatData[i].message});
+        chats += newMessage;
     }
 
+    // Update page
     document.querySelector('#chat').innerHTML = chats;
+}
+
+// Append one chat at a time when in a channel
+// @param chatMessage one chat message (dictionary) from Flask
+function appendChat(chatMessage) {
+    const newMessage = MESSAGE_TEMPLATE({'username': chatMessage.username, 'message': chatMessage.message});
+    document.querySelector('#chat').innerHTML += newMessage;
 }
 
 // *****************************************************************************************************************************
@@ -78,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
             return false;
         };
 
-        // Send chat message - get message and emit event to Flask with username/channel and message
+        // Send chat message - get message and emit event to Flask with username, channel and message
         document.querySelector('#chat-input-form').onsubmit = () => {
             var message = document.querySelector('#txt-chat-input').value;
             socket.emit('send_chat_message', {'username': localStorage.getItem('username'),

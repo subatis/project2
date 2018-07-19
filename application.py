@@ -16,7 +16,7 @@ app.config["SESSION_TYPE"] = "filesystem"
 Session(app)
 
 # Username set (to avoid duplicate usernames)
-usernames = {}
+usernames = set()
 
 # Channel list - add general channel by default
 # KEYS - channel names
@@ -67,13 +67,19 @@ def create_channel(data):
 def set_username():
     print ("username route called")
 
-    session["username"] = request.form.get("username")
+    new_username = request.form.get("username")
 
-    print(f"/set_username set username {session['username']}")
+    if new_username in usernames:
+        return "Duplicate"
+
+
+    usernames.add(new_username)
+
+    print(f"/set_username set username {new_username}")
 
     return "Success"
 
-# Get chat data
+# Get chat data for requested (current) channel
 @app.route("/get_chats", methods=["POST"])
 def get_chats():
     current_channel = request.form.get("current_channel")
