@@ -2,27 +2,23 @@ import os
 import datetime
 import json
 
-from flask import Flask, render_template, request, session, jsonify
-from flask_session import Session
+from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
-# Configure session to use filesystem
-app.config["SESSION_PERMANENT"] = False
-app.config["SESSION_TYPE"] = "filesystem"
-Session(app)
-
 # Username set (to avoid duplicate usernames)
 usernames = set()
 
 # Channel list - add general channel by default
-# KEYS - channel names
-# VALUES - lists of messages
-# MESSAGES - dictionaries following convention: channel, username, message, timestamp
+# KEYS/VALUES - channel names/lists of messages in each channel
+# MESSAGES (in lists) - dictionaries following the convention: channel, username, message, timestamp, if msg exceeds channel limit
 channel_list = { "general": [] }
+
+# Maximum number of messages per channel
+MAX_MESSAGES = 100
 
 # Main route
 @app.route("/")
@@ -32,59 +28,49 @@ def index():
 # Sending a chat message; receive event and emit chats to display
 @socketio.on("send_chat_message")
 def send_chat_message(data):
-    print("Socket IO: send chat called")
+    # Create new message from incoming data as dictionary and append to message list in appropriate channel
+    newMessage = {
+                    "channel": data["channel"],
+                    "username": data["username"],
+                    "message": data["message"],
+                    "timestamp": datetime.datetime.now().strftime("%I:%M:%S %D"),
+                    "exceeded_limit": False
+                 }
 
-    message_text = data["message"]
-    username = data["username"]
-    channel = data["channel"]
+    channel_list[newMessage["channel"]].append(newMessage)
 
-    print (f"Adding new message to {channel} by {username}: {message_text}")
+    # If we have exceeded max messages in a channel message list, remove oldest message
+    if len(channel_list[newMessage["channel"]]) > MAX_MESSAGES:
+        channel_list[newMessage["channel"]].pop(0)
+        newMessage["exceeded_limit"] = True
 
-    channel_list[channel].append({
-                                    "channel": channel,
-                                    "username": username,
-                                    "message": message_text,
-                                    "timestamp": datetime.datetime.now().strftime("%I:%M:%S %D")
-                                })
-
-    # only emits chat list for channel where new message was received
-    emit("received_chat_message", channel_list[channel], broadcast=True)
+    # Emit the newly received message
+    emit("received_chat_message", newMessage, broadcast=True)
 
 # Adding a new channel; receive event and emit list of channel names for rendering
 @socketio.on("create_channel")
 def create_channel(data):
-    print("Socket IO: create channel called")
-
-    new_channel = data["channel_name"]
-    channel_list[new_channel] = []
-
-    print(f"Appended channel {new_channel}")
+    # If channel does not exist, add new channel
+    if data["channel_name"] not in channel_list:
+        channel_list[data["channel_name"]] = []
 
     emit("channel_created", list(channel_list.keys()), broadcast=True)
 
 # Set username and check for duplicates
 @app.route("/set_username", methods=["POST"])
 def set_username():
-    print ("username route called")
-
     new_username = request.form.get("username")
 
     if new_username in usernames:
         return "Duplicate"
 
-
     usernames.add(new_username)
-
-    print(f"/set_username set username {new_username}")
-
     return "Success"
 
 # Get chat data for requested (current) channel
 @app.route("/get_chats", methods=["POST"])
 def get_chats():
     current_channel = request.form.get("current_channel")
-
-    print(f"/get chats: getting chat data from {current_channel}")
 
     # If channel doesn't exist, set to general
     if current_channel not in channel_list:

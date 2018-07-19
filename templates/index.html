@@ -23,12 +23,13 @@
         <!-- Handlebars & Templates -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.min.js"></script>
 
+        <!-- Chat message -->
         <script type="text/x-handlebars-template" id="template-chat-message">
         {% raw -%}
 
                 <div class="card">
                     <div class="card-header">
-                        {{ username }} said:
+                        {{ username }} said: <small class="float-right">{{ timestamp }}</small>
                     </div>
                     <div class="card-body">
                         {{ message }}
@@ -38,8 +39,15 @@
         {%- endraw %}
         </script>
 
-        <script type="text/template" id="channel-list-item">
+        <!-- Channel list items -->
+        <script type="text/template" id="template-channel-list-item">
+        {% raw -%}
 
+                <a href="#" class="list-group-item list-group-item-action" id="channel-list-item-{{ channel }}">
+                    {{ channel }}
+                </a>
+
+        {%- endraw %}
         </script>
 
         <!-- My javascript -->
@@ -115,7 +123,6 @@
                                 <input type="text" class="form-control" name="chat-input" placeholder="Chat here" id="txt-chat-input">
                                 <button type="submit" class="btn btn-primary btn-chat">Chat</button>
                             </form>
-                            <button type="submit" class="btn btn-primary btn-change" id="btn-change">Change Name</button>
                         </div>
                     </div>
                 </div>
