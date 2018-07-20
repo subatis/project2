@@ -19,11 +19,16 @@
     align-items: center;
 }
 
+/* Buttons */
+button
+{
+  border-radius: 0px !important;
+}
+
 /* Main page container */
 
 #main-page-body
 {
-  height: 800px;
   background-image: url("background.png");
 }
 

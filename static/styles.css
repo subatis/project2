@@ -13,6 +13,11 @@
   align-items: center;
 }
 
+/* Buttons */
+button {
+  border-radius: 0px !important;
+}
+
 
 /* Channel sidebar */
 .btn-create-channel {
@@ -23,7 +28,6 @@
   width: 90% !important; }
 
 #main-page-body {
-  height: 800px;
   background-image: url("background.png");
 }
 

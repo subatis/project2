@@ -4,6 +4,7 @@
 
 const MESSAGE_TEMPLATE = Handlebars.compile(document.querySelector('#template-chat-message').innerHTML);
 const CHANNEL_LIST_ITEM_TEMPLATE = Handlebars.compile(document.querySelector('#template-channel-list-item').innerHTML);
+const USER_LIST_ITEM_TEMPLATE = Handlebars.compile(document.querySelector('#template-user-list-item').innerHTML);
 
 // *****************************************************************************************************************************
 // ***** FUNCTION DEFINITIONS    ***********************************************************************************************
@@ -11,7 +12,7 @@ const CHANNEL_LIST_ITEM_TEMPLATE = Handlebars.compile(document.querySelector('#t
 
 // Display channel list & set onClick functionality for selecting a channel
 // @param channels An array of channel names from Flask (list of dictionary keys)
-function showChannels(channels) {
+function showChannels(socket, channels) {
 
     // Generate and display channel list
     let channelList = '';
@@ -25,16 +26,33 @@ function showChannels(channels) {
     // Set change channel functionality for each list item (e.g. to update channel display)
     document.querySelectorAll('.list-group-item-action').forEach(function(channel) {
         channel.onclick = function() {
-            // Refresh chat area with selected channel on click
+            // Clear chat area and get new channel name from id
             document.querySelector('#chat').innerHTML = '';
             var newChannel = this.id.replace('channel-list-item-', '');
+
+            // Notify Flask of channel change and set local storage
+            socket.emit('join_channel', {'username': localStorage.getItem('username'),
+                        'old_channel': localStorage.getItem('current_channel'), 'new_channel': newChannel});
             localStorage.setItem('current_channel', newChannel);
 
+            // Change display
             showCurrentChannelChat();
 
             return false;
         };
     });
+}
+
+// Display list of users for current channel
+function showUsers(users) {
+    // Generate and display channel list
+    let userList = '';
+    for (var i = 0; i < users.length; ++i) {
+        const newListItem = USER_LIST_ITEM_TEMPLATE({'username': users[i]});
+        userList += newListItem;
+    }
+
+    document.querySelector('#user-list').innerHTML = userList;
 }
 
 // Display current channel chat in its entirety (e.g. refresh entire chat when changing channels or loading page)
@@ -157,13 +175,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen for changes to channel list
     socket.on('channel_created', data => {
-        showChannels(data);
+        showChannels(socket, data);
     });
 
     // Listen for changes to chat, but only update display if the new chat is in the user's current channel
     socket.on('received_chat_message', data => {
         if (data.channel == localStorage.getItem('current_channel'))
             appendChat(data);
+    });
+
+    // Listen for when a user leaves a channel
+    socket.on('left_channel', data => {
+        if (data.channel == localStorage.getItem('current_channel'))
+            showUsers(data.users);
+    });
+
+    // Listen for when a user leaves a channel
+    socket.on('joined_channel', data => {
+        if (data.channel == localStorage.getItem('current_channel'))
+            showUsers(data.users);
     });
 
     // Set username
@@ -196,7 +226,11 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('current_channel', 'general');
         }
 
-        showChannels(data);
+        // Notify Flask of user join
+        socket.emit('join_channel', {'username': localStorage.getItem('username'),
+                        'old_channel': false, 'new_channel': localStorage.getItem('current_channel')});
+
+        showChannels(socket, data);
         showCurrentChannelChat();
     };
 
