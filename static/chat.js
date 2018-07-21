@@ -24,7 +24,7 @@ function showChannels(socket, channels) {
     document.querySelector('#channel-list').innerHTML = channelList;
 
     // Set change channel functionality for each list item (e.g. to update channel display)
-    document.querySelectorAll('.list-group-item-action').forEach(function(channel) {
+    document.querySelectorAll('.list-group-item-channel').forEach(function(channel) {
         channel.onclick = function() {
             // Clear chat area and get new channel name from id
             document.querySelector('#chat').innerHTML = '';
@@ -45,7 +45,7 @@ function showChannels(socket, channels) {
 
 // Display list of users for current channel
 function showUsers(users) {
-    // Generate and display channel list
+    // Generate and display user list
     let userList = '';
     for (var i = 0; i < users.length; ++i) {
         const newListItem = USER_LIST_ITEM_TEMPLATE({'username': users[i]});
@@ -111,8 +111,7 @@ function setUsername(username) {
                 alert('Sorry, this username is already taken');
 
                 // Remove from local storage if this is a relic from a previous visit and the username has since been taken
-                if (localStorage.getItem('username'))
-                    localStorage.removeItem('username');
+                localStorage.removeItem('username');
             }
             // If successful, set local storage
             else {

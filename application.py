@@ -9,10 +9,11 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = os.getenv("SECRET_KEY")
 socketio = SocketIO(app)
 
-# Channel class -- maintains a list of messages and users currently in the channel
+# Channel class -- maintains a list of messages and users currently in the channel, and the SID of the channel's creator
 # MESSAGES (in lists) - dictionaries following the convention: channel, username, message, timestamp, if msg exceeds channel limit
 class Channel:
-    def __init__(self):
+    def __init__(self, creator):
+        self.created_by = creator
         self.messages = []
         self.users = []
 
@@ -21,7 +22,7 @@ usernames = {}
 
 # Channel list - add general channel by default
 # KEYS/VALUES - channel names(unique keys, for easy duplicate catching) and actual class objects themselves
-channel_list = { "general": Channel() }
+channel_list = { "general": Channel("default") }
 
 # Maximum number of messages per channel
 MAX_MESSAGES = 100
@@ -53,14 +54,19 @@ def send_chat_message(data):
     # Emit the newly received message
     emit("received_chat_message", newMessage, broadcast=True)
 
-# Adding a new channel; receive event and emit list of channel names for rendering
+# Adding a new channel
 @socketio.on("create_channel")
 def create_channel(data):
-    # If channel does not exist, add new channel
-    if data["channel_name"] not in channel_list:
-        channel_list[data["channel_name"]] = Channel()
 
-    emit("channel_created", list(channel_list.keys()), broadcast=True)
+    print(data["sid"])
+
+    # If channel does not exist, add new channel and set creator ID
+    if data["new_channel"] not in channel_list:
+        channel_list[data["new_channel"]] = Channel(data["sid"])
+
+        # Emit event to update channel lists and user lists of respective channels and join creator to new channel
+        emit("channel_created", list(channel_list.keys()), broadcast=True)
+        join_channel(data)
 
 # Update user lists on channel change and emit changed lists
 @socketio.on("join_channel")
@@ -69,18 +75,14 @@ def join_channel(data):
     old_channel = data["old_channel"]
     new_channel = data["new_channel"]
 
-    print(f"called join_channel: {username} leaving {old_channel}, joining {new_channel}")
-
-    # Remove user from old channel if it exists and emit changed list
+    # Remove user from old channel if it exists and emit changed list ('old' channel does not exist on first visit)
     if old_channel:
         channel_list[old_channel].users.remove(username)
-        old_channel_users = { "channel": old_channel, "users": channel_list[old_channel].users }
-        emit("left_channel", old_channel_users, broadcast=True)
+        emit("joined_or_left_channel", {'channel': old_channel, 'users': channel_list[old_channel].users}, broadcast=True)
 
     # Add user to new channel and emit changed list
     channel_list[new_channel].users.append(username)
-    new_channel_users = { "channel": new_channel, "users": channel_list[new_channel].users }
-    emit("joined_channel", new_channel_users, broadcast=True)
+    emit("joined_or_left_channel", {'channel': new_channel, 'users': channel_list[new_channel].users}, broadcast=True)
 
 # TODO
 # Remove a username on disconnect
@@ -89,18 +91,22 @@ def join_channel(data):
 #    del usernames[data["username"]]
 
 # Set username with session id and check for duplicates
-@app.route("/set_username", methods=["POST"])
-def set_username():
-    new_username = request.form.get("username")
-    sid = request.form.get("sid")
+@socketio.on("set_username")
+def set_username(data):
+    new_username = data["username"]
+    sid = data["sid"]
 
-    # if a different sid is trying to use an already taken username, return duplicate
+    print(f"set username called: {new_username}, {sid}")
+
+    # if a different sid is trying to use an already taken username, emit failure
     if new_username in usernames and usernames["new_username"] != sid:
-        return "Duplicate"
+        emit('created_username', {'sid': sid, 'success': False}, broadcast=True)
+        return
 
-    # otherwise, add username, assign sid and return success
+    # otherwise, add username, assign sid and emit success
     usernames["new_username"] = sid
-    return "Success"
+    emit('created_username', {'username': new_username, 'sid': sid, 'success': True}, broadcast=True)
+    print("created username emitted")
 
 # Get chat messages for requested (current) channel
 @app.route("/get_chats", methods=["POST"])
@@ -117,3 +123,14 @@ def get_chats():
 @app.route("/get_channels")
 def get_channels():
     return jsonify(list(channel_list.keys()))
+
+# Get user list
+@app.route("/get_users", methods=["POST"])
+def get_users():
+    current_channel = request.form.get("current_channel")
+
+    # If channel doesn't exist, set to general
+    if current_channel not in channel_list:
+        current_channel = "general"
+
+    return jsonify(channel_list[current_channel].users)

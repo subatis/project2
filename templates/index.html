@@ -43,7 +43,7 @@
         <script type="text/template" id="template-channel-list-item">
         {% raw -%}
 
-                <a href="#" class="list-group-item list-group-item-action" id="channel-list-item-{{ channel }}">
+                <a href="#" class="list-group-item list-group-item-action list-group-item-channel" id="channel-list-item-{{ channel }}">
                     {{ channel }}
                 </a>
 
@@ -62,7 +62,7 @@
         </script>
 
         <!-- My javascript -->
-        <script src="{{ url_for('static', filename='chat.js') }}"></script>
+        <script src="{{ url_for('static', filename='index.js') }}"></script>
 
         <title>Chat</title>
     </head>
