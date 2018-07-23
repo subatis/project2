@@ -25,8 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
             newChannelInput = document.querySelector('#txt-new-channel');
 
             if (newChannelInput.value !== '') {
-                console.log("text in create channel detected");
-
                 var newChannel = newChannelInput.value;
                 socket.emit('create_channel', {'new_channel': newChannel, 'old_channel': localStorage.getItem('current_channel'),
                                                 'username': localStorage.getItem('username'), 'sid': localStorage.getItem('sid')});
