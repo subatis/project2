@@ -7,19 +7,43 @@
   padding: 0px;
   margin: 0px; }
 
-/* Header */
+/* Global font & other styling */
+* {
+  font-family: "Trebuchet MS"; }
+
+/* Header & body */
 #banner-gradient {
   background: linear-gradient(to right, black, maroon);
   display: flex;
   align-items: center; }
 
-/* Buttons */
+body {
+  background-color: black; }
+
+#welcome-message {
+  font-style: italic;
+  color: #d6c5a2;
+  font-size: 75%; }
+
+/* Forms (buttons/text areas) */
 button {
-  border-radius: 0px !important; }
+  background-color: black !important;
+  color: #af0f0f !important;
+  border: none !important; }
+
+button:hover {
+  background-color: #a09f9f !important;
+  color: #af0f0f !important;
+  border: none !important; }
+
+input {
+  background-color: #4f4f4f !important;
+  color: white !important;
+  border: none !important; }
 
 /* Main page container */
 #main-page-body {
-  background-image: url("background.png"); }
+  background-color: black; }
 
 /* User/channel sidebar */
 .btn-create-channel {
@@ -29,13 +53,45 @@ button {
   background-color: black;
   color: #d6c5a2 !important; }
 
-/* Chat input */
-#chat-textfield {
-  width: 90% !important; }
+.list-group-item-action {
+  padding: 0.25em;
+  background-color: black;
+  color: white !important;
+  border-radius: 0px !important; }
 
+.list-group-item-action:hover {
+  background-color: #a09f9f;
+  color: white; }
+
+.list-group-item-action:focus {
+  background-color: black;
+  color: white; }
+
+/* Main chat area */
 #chat {
   overflow-y: scroll;
-  height: 75vh;
-}
+  height: 75vh; }
+
+.card {
+  color: white;
+  border: none; }
+
+.card-header {
+  background-color: gray;
+  padding: 0.5em; }
+
+.card-body {
+  background-color: black;
+  padding: 0.5em; }
+
+/* Chat input */
+#txt-chat-input {
+  width: 80% !important; }
+
+.btn-chat {
+  width: 20% !important; }
+
+#div-chat-input {
+  background-color: black; }
 
 /*# sourceMappingURL=styles.css.map */

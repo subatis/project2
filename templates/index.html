@@ -54,7 +54,7 @@
         <script type="text/template" id="template-user-list-item">
         {% raw -%}
 
-                <a href="#" class="list-group-item list-group-item-action" id="user-list-item-{{ username }}">
+                <a href="#" class="list-group-item list-group-item-action list-group-item-user" id="user-list-item-{{ username }}">
                     {{ username }}
                 </a>
 
@@ -77,17 +77,19 @@
                 </div>
                 <div class="col-6 no-space" id="banner-gradient">
                     <form class="form-inline" id="username-form">
-                        <input type="text" class="form-control-sm" name="username" placeholder="Enter chat handle" id="txt-username">
                         <button type="submit" class="btn btn-primary btn-sm" id="btn-username">Start Chatting</button>
+                        <input type="text" class="form-control-sm" name="username" placeholder="Enter chat handle" id="txt-username">
+
                     </form>
                 </div>
             </div>
 
-            <!-- Welcome, username -->
-            <div class="row">
-                <div class="col-12">
-                    <h5>You are chatting as <a id="username-display"></a> in channel <a id="channel-display"></a></h5>
+            <!-- You are chatting as X in Y -->
+            <div class="row" id="welcome-message">
+                <div class="col-11">
+                    <span class="float-right">You are chatting as <a id="username-display"></a> in channel <a id="channel-display"></a></span>
                 </div>
+                <div class="col-1"><!-- Spacing --></div>
             </div>
 
             <!-- Main chat section -->
@@ -105,7 +107,7 @@
 
                     <!-- Create new channel -->
                     <form id="new-channel-form">
-                        <input type="text" class="form-control" name="new-channel-name" placeholder="Enter new channel name" id="txt-new-channel">
+                        <input type="text" class="form-control" name="new-channel-name" placeholder="Enter channel name" id="txt-new-channel">
                         <button type="submit" class="btn btn-primary btn-create-channel">Create Channel</button>
                     </form>
                 </div>
@@ -120,14 +122,15 @@
             </div>
 
             <!-- Chat input -->
-            <div class="row">
+            <div class="row" id="div-chat-input">
                 <div class="col-2"><!-- Spacer to properly position chat input box --></div>
-                <div class="col-10">
+                <div class="col-9">
                     <form class="form-inline" id="chat-input-form">
                         <input type="text" class="form-control" name="chat-input" placeholder="Chat here" id="txt-chat-input">
                         <button type="submit" class="btn btn-primary btn-chat">Chat</button>
                     </form>
                 </div>
+                <div class="col-1"><!-- Spacer to properly position chat input box --></div>
             </div>
 
         </div>

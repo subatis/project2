@@ -21,25 +21,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // Once connected, configure forms/buttons
     socket.on('connect', () => {
         // Create channel - send new channel name and username/sid of creator as well as user's current channel
-        document.querySelector('#new-channel-form').onsubmit = () => {
+        document.querySelector('.btn-create-channel').onclick = () => {
             var newChannel = document.querySelector('#txt-new-channel').value;
             socket.emit('create_channel', {'new_channel': newChannel, 'old_channel': localStorage.getItem('current_channel'),
                                             'username': localStorage.getItem('username'), 'sid': localStorage.getItem('sid')});
+            // Clear textbox
+            document.querySelector('#txt-new-channel').value = '';
             return false;
         };
 
         // Set username - send username and sid
-        document.querySelector('#username-form').onsubmit = () => {
-            socket.emit('set_username', {'username': document.querySelector('#txt-username').value,
-                                            'sid': localStorage.getItem('sid')});
+        document.querySelector('#btn-username').onclick = () => {
+            usernameInput = document.querySelector('#txt-username');
+            socket.emit('set_username', {'username': usernameInput.value, 'sid': localStorage.getItem('sid')});
+
+            // Clear textbox
+            usernameInput.value = '';
             return false;
         };
 
         // Send chat message - send username, channel and message
-        document.querySelector('#chat-input-form').onsubmit = () => {
+        document.querySelector('.btn-chat').onclick = () => {
+            messageInput = document.querySelector('#txt-chat-input');
+
             socket.emit('send_chat_message', {'username': localStorage.getItem('username'),
                                                 'channel': localStorage.getItem('current_channel'),
-                                                'message': document.querySelector('#txt-chat-input').value});
+                                                'message': messageInput.value});
+            messageInput.value = '';
             return false;
         };
 
@@ -214,7 +222,11 @@ function showCurrentChannelChat() {
         }
 
         // Update page
-        document.querySelector('#chat').innerHTML = chats;
+        chatroom = document.querySelector('#chat');
+        chatroom.innerHTML = chats;
+
+        // Ensure we are scrolled all the way down to show most recent chats 1st
+        chatroom.scrollTop = chatroom.scrollHeight;
     };
 
     const currentChannel = new FormData();
@@ -237,12 +249,17 @@ function showUsers(users) {
 // Builds HTML & renders one chat at a time, when sending/receiving messages in a given channel
 // @param chatMessage one chat message (dictionary) from Flask
 function appendChat(chatMessage) {
+    chatroom = document.querySelector('#chat');
+
     const newMessage = MESSAGE_TEMPLATE({'username': chatMessage.username, 'message': chatMessage.message,
                                             'timestamp': chatMessage.timestamp});
-    document.querySelector('#chat').innerHTML += newMessage;
+    chatroom.innerHTML += newMessage;
 
     // If we are displaying more than 100 messages, delete the oldest (topmost) one from DOM
     if (chatMessage.exceeded_limit) {
         document.querySelector('.card').remove();
     }
+
+    // Ensure we are scrolled all the way down to show most recent chats 1st
+    chatroom.scrollTop = chatroom.scrollHeight;
 }

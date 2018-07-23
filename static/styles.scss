@@ -1,5 +1,9 @@
 /* Global values */
+$bckground-color: black;
 $static-text-color: #d6c5a2;
+$hover-color: #a09f9f;
+$text-input-color: #4f4f4f;
+$button-text-color: #af0f0f;
 
 /* Ensure banners span whole page */
 .container-fluid
@@ -13,26 +17,63 @@ $static-text-color: #d6c5a2;
     margin: 0px;
 }
 
-/* Header */
+/* Global font & other styling */
+*
+{
+    font-family: "Trebuchet MS";
+}
+
+/* Header & body */
 
 #banner-gradient
 {
-    background: linear-gradient(to right, black , maroon);
+    background: linear-gradient(to right, $bckground-color, maroon);
     display: flex;
     align-items: center;
 }
 
-/* Buttons */
+body
+{
+    background-color: $bckground-color;
+}
+
+
+#welcome-message
+{
+    font-style: italic;
+    color: $static-text-color;
+    font-size: 75%;
+}
+
+/* Forms (buttons/text areas) */
+
 button
 {
-    border-radius: 0px !important;
+    background-color: black !important;
+    color: $button-text-color !important;
+    border: none !important;
+
+}
+
+button:hover
+{
+    background-color: #a09f9f !important;
+    color: $button-text-color !important;
+    border: none !important;
+}
+
+input
+{
+    background-color: #4f4f4f !important;
+    color: white !important;
+    border: none !important;
 }
 
 /* Main page container */
 
 #main-page-body
 {
-    background-image: url("background.png");
+    background-color: $bckground-color;
 }
 
 /* User/channel sidebar */
@@ -44,11 +85,30 @@ button
 
 .list-group-item-dark
 {
-    background-color: black;
+    background-color: $bckground-color;
     color: $static-text-color !important;
 }
 
-/* Chat input */
+.list-group-item-action
+{
+    padding: 0.25em;
+    background-color: $bckground-color;
+    color: white !important;
+    border-radius: 0px !important;
+}
+
+.list-group-item-action:hover {
+    background-color: $hover-color;
+    color: white;
+}
+
+.list-group-item-action:focus
+{
+    background-color: $bckground-color;
+    color: white;
+}
+
+/* Main chat area */
 
 #chat
 {
@@ -56,8 +116,38 @@ button
     height: 75vh;
 }
 
-#chat-textfield
+.card
 {
-    width: 90% !important;
+    color: white;
+    border: none;
+}
+
+.card-header
+{
+    background-color: gray;
+    padding: 0.5em;
+}
+
+.card-body
+{
+    background-color: black;
+    padding: 0.5em;
+}
+
+/* Chat input */
+
+#txt-chat-input
+{
+    width: 80% !important;
+}
+
+.btn-chat
+{
+    width: 20% !important;
+}
+
+#div-chat-input
+{
+    background-color: $bckground-color;
 }
 
