@@ -22,21 +22,28 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('connect', () => {
         // Create channel - send new channel name and username/sid of creator as well as user's current channel
         document.querySelector('.btn-create-channel').onclick = () => {
-            var newChannel = document.querySelector('#txt-new-channel').value;
-            socket.emit('create_channel', {'new_channel': newChannel, 'old_channel': localStorage.getItem('current_channel'),
-                                            'username': localStorage.getItem('username'), 'sid': localStorage.getItem('sid')});
-            // Clear textbox
-            document.querySelector('#txt-new-channel').value = '';
+            newChannelInput = document.querySelector('#txt-new-channel');
+
+            if (newChannelInput.value !== '') {
+                console.log("text in create channel detected");
+
+                var newChannel = newChannelInput.value;
+                socket.emit('create_channel', {'new_channel': newChannel, 'old_channel': localStorage.getItem('current_channel'),
+                                                'username': localStorage.getItem('username'), 'sid': localStorage.getItem('sid')});
+                // Clear textbox
+                document.querySelector('#txt-new-channel').value = '';
+            }
             return false;
         };
 
         // Set username - send username and sid
         document.querySelector('#btn-username').onclick = () => {
             usernameInput = document.querySelector('#txt-username');
-            socket.emit('set_username', {'username': usernameInput.value, 'sid': localStorage.getItem('sid')});
 
+            socket.emit('set_username', {'username': usernameInput.value, 'sid': localStorage.getItem('sid')});
             // Clear textbox
             usernameInput.value = '';
+
             return false;
         };
 
@@ -44,10 +51,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('.btn-chat').onclick = () => {
             messageInput = document.querySelector('#txt-chat-input');
 
-            socket.emit('send_chat_message', {'username': localStorage.getItem('username'),
+            // Check to ensure there is a value and process accordingly
+            if (messageInput.value !== '') {
+                console.log("text in create channel detected");
+
+                socket.emit('send_chat_message', {'username': localStorage.getItem('username'),
                                                 'channel': localStorage.getItem('current_channel'),
                                                 'message': messageInput.value});
-            messageInput.value = '';
+                // Clear textbox
+                messageInput.value = '';
+            }
+
             return false;
         };
 
@@ -132,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Duplicate username; hide page and alert user
             else {
                 document.querySelector('#main-page-body').style.visibility = 'hidden';
-                alert('Sorry, this username is already taken! Please choose a new alias.');
+                alert('Username already taken or invalid! Please choose a new alias.');
 
                 // If this was a relic from a previous session and the name has since been taken, remove from local storage
                 localStorage.removeItem('username');

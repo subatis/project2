@@ -84,53 +84,57 @@
                 </div>
             </div>
 
-            <!-- You are chatting as X in Y -->
-            <div class="row" id="welcome-message">
-                <div class="col-11">
-                    <span class="float-right">You are chatting as <a id="username-display"></a> in channel <a id="channel-display"></a></span>
-                </div>
-                <div class="col-1"><!-- Spacing --></div>
-            </div>
-
             <!-- Main chat section -->
-            <div class="row" id="main-page-body">
-                <div class="col-2">
-                        <div class="list-group">
-                            <!-- Channel list -->
-                            <a class="list-group-item list-group-item-dark">Channels</a>
-                            <div id="channel-list"></div>
+            <div id="main-page-body">
 
-                            <!-- User list -->
-                            <a class="list-group-item list-group-item-dark">Users</a>
-                            <div id="user-list"></div>
-                        </div>
-
-                    <!-- Create new channel -->
-                    <form id="new-channel-form">
-                        <input type="text" class="form-control" name="new-channel-name" placeholder="Enter channel name" id="txt-new-channel">
-                        <button type="submit" class="btn btn-primary btn-create-channel">Create Channel</button>
-                    </form>
+                <!-- You are chatting as X in Y -->
+                <div class="row" id="welcome-message">
+                    <div class="col-11">
+                        <span class="float-right">You are chatting as <a id="username-display"></a> in channel <a id="channel-display"></a></span>
+                    </div>
+                    <div class="col-1"><!-- Spacing --></div>
                 </div>
 
-                <div class="col-9" id="chat">
-                    <!-- Chat displayed here -->
+                <div class="row">
+                    <div class="col-2">
+                            <div class="list-group">
+                                <!-- Channel list -->
+                                <a class="list-group-item list-group-item-dark">Channels</a>
+                                <div id="channel-list"></div>
+
+                                <!-- User list -->
+                                <a class="list-group-item list-group-item-dark">Users</a>
+                                <div id="user-list"></div>
+                            </div>
+
+                        <!-- Create new channel -->
+                        <form id="new-channel-form">
+                            <input type="text" class="form-control" name="new-channel-name" placeholder="Enter channel name" id="txt-new-channel">
+                            <button type="submit" class="btn btn-primary btn-create-channel">Create Channel</button>
+                        </form>
+                    </div>
+
+                    <div class="col-9" id="chat">
+                        <!-- Chat displayed here -->
+                    </div>
+
+                    <div class="col-1">
+                        <!-- Spacer (mostly to ensure chat scroll is always visible -->
+                    </div>
                 </div>
 
-                <div class="col-1">
-                    <!-- Spacer (mostly to ensure chat scroll is always visible -->
+                <!-- Chat input -->
+                <div class="row" id="div-chat-input">
+                    <div class="col-2"><!-- Spacer to properly position chat input box --></div>
+                    <div class="col-9">
+                        <form class="form-inline" id="chat-input-form">
+                            <input type="text" class="form-control" name="chat-input" placeholder="Chat here" id="txt-chat-input">
+                            <button type="submit" class="btn btn-primary btn-chat">Chat</button>
+                        </form>
+                    </div>
+                    <div class="col-1"><!-- Spacer to properly position chat input box --></div>
                 </div>
-            </div>
 
-            <!-- Chat input -->
-            <div class="row" id="div-chat-input">
-                <div class="col-2"><!-- Spacer to properly position chat input box --></div>
-                <div class="col-9">
-                    <form class="form-inline" id="chat-input-form">
-                        <input type="text" class="form-control" name="chat-input" placeholder="Chat here" id="txt-chat-input">
-                        <button type="submit" class="btn btn-primary btn-chat">Chat</button>
-                    </form>
-                </div>
-                <div class="col-1"><!-- Spacer to properly position chat input box --></div>
             </div>
 
         </div>

@@ -119,7 +119,7 @@ def set_username(data):
     print(f"set username called: {new_username}, {sid}")
 
     # if a different sid is trying to use an already taken username, emit failure
-    if new_username in usernames and usernames["new_username"] != sid:
+    if (new_username in usernames and usernames["new_username"] != sid) or (new_username.strip() == ""):
         emit('created_username', {'sid': sid, 'success': False}, broadcast=True)
         return
 
