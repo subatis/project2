@@ -54,6 +54,35 @@ def send_chat_message(data):
     # Emit the newly received message
     emit("received_chat_message", newMessage, broadcast=True)
 
+# Sending a private message
+@socketio.on("send_private_chat_message")
+def send_private_chat_message(data):
+    # Parse out target's username from message
+    # Strip @ sign from message and find index of first space after that
+    message = data["message"].strip("@")
+    msg_start_index = message.find(" ")
+
+    # Get target username by parsing out string before aforementioned space; if formatted incorrectly the msg simply won't reach user
+    target_username = message[:msg_start_index]
+
+    # Strip username to get rest of message and add (privately) label
+    message = "(privately to " + target_username + ") " + message[msg_start_index:]
+
+    # Create new message from incoming data as dictionary, including target user
+    newMessage = {
+                    "channel": data["channel"],
+                    "username": data["username"],
+                    "target_username": target_username,
+                    "message": message,
+                    "timestamp": datetime.datetime.now().strftime("%I:%M:%S %D"),
+                    "exceeded_limit": False
+                 }
+
+    print(f"attempting to send private chat message: {message} to {target_username}")
+
+    # Emit the newly received message
+    emit("received_private_chat_message", newMessage, broadcast=True)
+
 # Adding a new channel
 @socketio.on("create_channel")
 def create_channel(data):

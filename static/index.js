@@ -53,11 +53,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Check to ensure there is a value and process accordingly
             if (messageInput.value !== '') {
-                console.log("text in create channel detected");
 
-                socket.emit('send_chat_message', {'username': localStorage.getItem('username'),
-                                                'channel': localStorage.getItem('current_channel'),
-                                                'message': messageInput.value});
+                // Check if we are trying to send a private message
+                if (messageInput.value.charAt(0) === '@') {
+                    socket.emit('send_private_chat_message', {'username': localStorage.getItem('username'),
+                                                    'channel': localStorage.getItem('current_channel'),
+                                                    'message': messageInput.value});
+                }
+
+                else {
+                    socket.emit('send_chat_message', {'username': localStorage.getItem('username'),
+                                                    'channel': localStorage.getItem('current_channel'),
+                                                    'message': messageInput.value});
+                }
+
                 // Clear textbox
                 messageInput.value = '';
             }
@@ -90,6 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen for changes to chat, but only update display if the new chat is in the user's current channel
     socket.on('received_chat_message', data => {
         if (data.channel === localStorage.getItem('current_channel'))
+            appendChat(data);
+    });
+
+    // Listen for private messages; note that these are "temporary" and will be cleared if leaving channel or site
+    socket.on('received_private_chat_message', data => {
+        if (data.target_username === localStorage.getItem('username') || data.username === localStorage.getItem('username'))
             appendChat(data);
     });
 
