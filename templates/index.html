@@ -92,11 +92,15 @@
 
             <!-- Main chat section -->
             <div class="row" id="main-page-body">
-                <div class="col-3">
-                    <!-- Channel list -->
+                <div class="col-2">
                         <div class="list-group">
+                            <!-- Channel list -->
                             <a class="list-group-item list-group-item-dark">Channels</a>
                             <div id="channel-list"></div>
+
+                            <!-- User list -->
+                            <a class="list-group-item list-group-item-dark">Users</a>
+                            <div id="user-list"></div>
                         </div>
 
                     <!-- Create new channel -->
@@ -106,34 +110,23 @@
                     </form>
                 </div>
 
-                <div class="col-9">
-                    <div class="row">
-                        <div class="col-9">
-                            <div id="chat">
-                                <!-- Chat displayed here -->
-                            </div>
-                        </div>
-                    </div>
+                <div class="col-9" id="chat">
+                    <!-- Chat displayed here -->
+                </div>
 
-                    <!-- Chat input -->
-                    <div class="row">
-                        <div class="col-9">
-                            <form class="form-inline" id="chat-input-form">
-                                <input type="text" class="form-control" name="chat-input" placeholder="Chat here" id="txt-chat-input">
-                                <button type="submit" class="btn btn-primary btn-chat">Chat</button>
-                            </form>
-                        </div>
-                    </div>
+                <div class="col-1">
+                    <!-- Spacer (mostly to ensure chat scroll is always visible -->
                 </div>
             </div>
 
-            <!-- User list -->
+            <!-- Chat input -->
             <div class="row">
-                <div class="col-12">
-                    <div class="list-group">
-                        <a class="list-group-item list-group-item-dark">Users</a>
-                        <div id="user-list"></div>
-                    </div>
+                <div class="col-2"><!-- Spacer to properly position chat input box --></div>
+                <div class="col-10">
+                    <form class="form-inline" id="chat-input-form">
+                        <input type="text" class="form-control" name="chat-input" placeholder="Chat here" id="txt-chat-input">
+                        <button type="submit" class="btn btn-primary btn-chat">Chat</button>
+                    </form>
                 </div>
             </div>
 

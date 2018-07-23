@@ -1,3 +1,4 @@
+/* Global values */
 /* Ensure banners span whole page */
 .container-fluid {
   padding: 0px; }
@@ -10,26 +11,31 @@
 #banner-gradient {
   background: linear-gradient(to right, black, maroon);
   display: flex;
-  align-items: center;
-}
+  align-items: center; }
 
 /* Buttons */
 button {
-  border-radius: 0px !important;
-}
+  border-radius: 0px !important; }
 
+/* Main page container */
+#main-page-body {
+  background-image: url("background.png"); }
 
-/* Channel sidebar */
+/* User/channel sidebar */
 .btn-create-channel {
   width: 100%; }
+
+.list-group-item-dark {
+  background-color: black;
+  color: #d6c5a2 !important; }
 
 /* Chat input */
 #chat-textfield {
   width: 90% !important; }
 
-#main-page-body {
-  background-image: url("background.png");
+#chat {
+  overflow-y: scroll;
+  height: 75vh;
 }
-
 
 /*# sourceMappingURL=styles.css.map */

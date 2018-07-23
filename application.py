@@ -58,14 +58,19 @@ def send_chat_message(data):
 @socketio.on("create_channel")
 def create_channel(data):
 
-    print(data["sid"])
+    username = data["username"]
+    old_channel = data["old_channel"]
+    new_channel = data["new_channel"]
+    sid = data["sid"]
+
+    print(f"{username}/{sid} attempting to create {new_channel} | old channel: {old_channel}")
 
     # If channel does not exist, add new channel and set creator ID
     if data["new_channel"] not in channel_list:
         channel_list[data["new_channel"]] = Channel(data["sid"])
 
         # Emit event to update channel lists and user lists of respective channels and join creator to new channel
-        emit("channel_created", list(channel_list.keys()), broadcast=True)
+        emit("channel_created", {'new_channel': data["new_channel"], 'sid': data["sid"], 'channels': list(channel_list.keys())}, broadcast=True)
         join_channel(data)
 
 # Update user lists on channel change and emit changed lists
@@ -75,14 +80,29 @@ def join_channel(data):
     old_channel = data["old_channel"]
     new_channel = data["new_channel"]
 
+    print(f"{username} attempting to leave {old_channel} and join {new_channel}")
+
+    # If attempting to join channel we are already in, simply return
+    if data["old_channel"] == data["new_channel"]:
+        return
+
     # Remove user from old channel if it exists and emit changed list ('old' channel does not exist on first visit)
     if old_channel:
+        print(f"{old_channel} user list before leave:")
+        print(channel_list[old_channel].users)
         channel_list[old_channel].users.remove(username)
+        print(f"{old_channel} user list after leave:")
+        print(channel_list[old_channel].users)
         emit("joined_or_left_channel", {'channel': old_channel, 'users': channel_list[old_channel].users}, broadcast=True)
 
-    # Add user to new channel and emit changed list
-    channel_list[new_channel].users.append(username)
-    emit("joined_or_left_channel", {'channel': new_channel, 'users': channel_list[new_channel].users}, broadcast=True)
+    # If the user isn't already in the channel, add them and emit changed list
+    if username not in channel_list[new_channel].users:
+        print(f"{new_channel} user list before join:")
+        print(channel_list[new_channel].users)
+        channel_list[new_channel].users.append(username)
+        print(f"{new_channel} channel user list after join:")
+        print(channel_list[new_channel].users)
+        emit("joined_or_left_channel", {'channel': new_channel, 'users': channel_list[new_channel].users}, broadcast=True)
 
 # TODO
 # Remove a username on disconnect

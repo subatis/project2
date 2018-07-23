@@ -1,3 +1,10 @@
+// This is just to remove the (pointless and) annoying warnings in the online IDE
+// See https://stackoverflow.com/questions/38270011/varname-is-not-defined-please-fix-or-add-global-varname-cloud9
+/*global io*/
+/*global localStorage*/
+/*global location*/
+/*global Handlebars */
+
 // *****************************************************************************************************************************
 // ***** ON DOM LOAD    ********************************************************************************************************
 // *****************************************************************************************************************************
@@ -43,8 +50,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen for changes to channel list
     socket.on('channel_created', data => {
-        showChannels(socket, data);
-        //TODO check sid? showCurrentChannelChat();
+        showChannels(socket, data.channels);
+
+        // if the channel was created successfully, automatically put the creator into the channel
+        if (data.sid === localStorage.getItem('sid')) {
+            localStorage.setItem('current_channel', data.new_channel);
+            showCurrentChannelChat();
+        }
     });
 
     // Listen for when a user joins or leaves a channel
@@ -55,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen for changes to chat, but only update display if the new chat is in the user's current channel
     socket.on('received_chat_message', data => {
-        if (data.channel == localStorage.getItem('current_channel'))
+        if (data.channel === localStorage.getItem('current_channel'))
             appendChat(data);
     });
 
@@ -65,19 +77,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (data.sid === localStorage.getItem('sid')) {
             if (data.success) {
                 localStorage.setItem('username', data["username"]);
-                var channel = '';
 
                 // Join locally stored channel if it exists, otherwise join general
+                var channel = '';
                 if (localStorage.getItem('current_channel')) {
                     channel = localStorage.getItem('current_channel');
                 }
                 else {
                     channel = 'general';
+                    localStorage.setItem('current_channel', 'general');
                 }
 
                 // Join channel
-                // TODO this may allow user to join channel twice by changing name; manage by sid?
-                socket.emit('join_channel', {'username': localStorage.getItem('username'), 'old_channel': false, 'new_channel': channel});
+                socket.emit('join_channel', {'username': localStorage.getItem('username'),
+                                                'old_channel': false, 'new_channel': channel});
 
                 // Show chat area and set welcome message
                 document.querySelector('#main-page-body').style.visibility = 'visible';
@@ -89,15 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 requestChannels.open('GET', '/get_channels');
                 requestChannels.onload = () => {
                     const data = JSON.parse(requestChannels.responseText);
-                    // If locally stored channel doesn't exist, set to general
-                    if (!localStorage.getItem('current_channel') || !data.includes(localStorage.getItem('current_channel'))) {
-                        localStorage.setItem('current_channel', 'general');
-                    }
-
-                    // Notify Flask of user join
-                    socket.emit('join_channel', {'username': localStorage.getItem('username'),
-                                                    'old_channel': false, 'new_channel': localStorage.getItem('current_channel')});
-
                     showChannels(socket, data);
                 };
                 requestChannels.send();
@@ -106,7 +110,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const requestUsers = new XMLHttpRequest();
                 requestUsers.open('POST', '/get_users');
                 requestUsers.onload = () => {
-                    const data = JSON.parse(requestChannels.responseText);
+                    const data = JSON.parse(requestUsers.responseText);
                     showUsers(data);
                 };
                 const curChannel = new FormData();
@@ -139,7 +143,6 @@ document.addEventListener('DOMContentLoaded', () => {
     else {
         document.querySelector('#main-page-body').style.visibility = 'hidden';
     }
-
 
 });
 
