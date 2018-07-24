@@ -65,7 +65,7 @@ def send_private_chat_message(data):
     # Get target username by parsing out string before aforementioned space; if formatted incorrectly the msg simply won't reach user
     target_username = message[:msg_start_index]
 
-    # Strip username to get rest of message and add (privately) label
+    # Strip username to get rest of message and add "(privately)" label to message
     message = "(privately to " + target_username + ") " + message[msg_start_index:]
 
     # Create new message from incoming data as dictionary, including target user
@@ -78,21 +78,16 @@ def send_private_chat_message(data):
                     "exceeded_limit": False
                  }
 
-    print(f"attempting to send private chat message: {message} to {target_username}")
-
     # Emit the newly received message
     emit("received_private_chat_message", newMessage, broadcast=True)
 
 # Adding a new channel
 @socketio.on("create_channel")
 def create_channel(data):
-
     username = data["username"]
     old_channel = data["old_channel"]
     new_channel = data["new_channel"]
     sid = data["sid"]
-
-    print(f"{username}/{sid} attempting to create {new_channel} | old channel: {old_channel}")
 
     # If channel does not exist, add new channel and set creator ID
     if data["new_channel"] not in channel_list:
@@ -109,28 +104,18 @@ def join_channel(data):
     old_channel = data["old_channel"]
     new_channel = data["new_channel"]
 
-    print(f"{username} attempting to leave {old_channel} and join {new_channel}")
-
     # If attempting to join channel we are already in, simply return
     if data["old_channel"] == data["new_channel"]:
         return
 
     # Remove user from old channel if it exists and emit changed list ('old' channel does not exist on first visit)
     if old_channel:
-        print(f"{old_channel} user list before leave:")
-        print(channel_list[old_channel].users)
         channel_list[old_channel].users.remove(username)
-        print(f"{old_channel} user list after leave:")
-        print(channel_list[old_channel].users)
         emit("joined_or_left_channel", {'channel': old_channel, 'users': channel_list[old_channel].users}, broadcast=True)
 
     # If the user isn't already in the channel, add them and emit changed list
     if username not in channel_list[new_channel].users:
-        print(f"{new_channel} user list before join:")
-        print(channel_list[new_channel].users)
         channel_list[new_channel].users.append(username)
-        print(f"{new_channel} channel user list after join:")
-        print(channel_list[new_channel].users)
         emit("joined_or_left_channel", {'channel': new_channel, 'users': channel_list[new_channel].users}, broadcast=True)
 
 # TODO
@@ -144,18 +129,24 @@ def join_channel(data):
 def set_username(data):
     new_username = data["username"]
     sid = data["sid"]
+    old_username = data["old_username"]
+    current_channel = data["current_channel"]
 
-    print(f"set username called: {new_username}, {sid}")
-
-    # if a different sid is trying to use an already taken username, emit failure
-    if (new_username in usernames and usernames["new_username"] != sid) or (new_username.strip() == ""):
+    # If a different sid is trying to use an already taken username, or the name is blank, emit failure
+    if (new_username in usernames and usernames[new_username] != sid) or (new_username.strip() == ""):
         emit('created_username', {'sid': sid, 'success': False}, broadcast=True)
         return
 
-    # otherwise, add username, assign sid and emit success
-    usernames["new_username"] = sid
+    # Otherwise, add username, assign sid and emit success
+    usernames[new_username] = sid
+
+    # If the user is changing their name, remove old username from the username list as well as from the current channel user list
+    if old_username:
+        del usernames[old_username]
+        if current_channel:
+            channel_list[current_channel].users.remove(old_username)
+
     emit('created_username', {'username': new_username, 'sid': sid, 'success': True}, broadcast=True)
-    print("created username emitted")
 
 # Get chat messages for requested (current) channel
 @app.route("/get_chats", methods=["POST"])

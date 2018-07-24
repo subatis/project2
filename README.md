@@ -5,18 +5,18 @@ TODO: usernames appearing in user list when changing name (using SID?), socket d
 
 Web Programming with Python and JavaScript
 
-This project had a steep learning curve. Ultimately it became clear that JavaScript, Flask/Python, Handlebars, etc. were all
-pretty straightforward in and of themselves--the tricky part was wrapping my head around AJAX/SocketIO and knowing how data
-was being moved back and forth! In retrospect, knowing now what I DIDN'T know then, I would love to go back and redo this project
-from scratch, putting lots of thought into the JSON data moving back and forth FIRST, but I'm still OK with where this ended up.
+This project had a steep learning curve for me--it took my awhile to realize that the gap in my knowledge mostly came down to
+AJAX/socketio/JSON and how data was being passed between the server & client. I do somewhat wish I could tear it all down and
+rebuild it from scratch but no time for that :)
 
 General notes:
--We didn't really talk about individual sockets, user IDs, and so on during class. It was not entirely clear to me how much we were
-expected to 'remember' users (beyond just usernames in local storage)--in real life, we'd have to be checking USERNAMES vs COMPUTER/SOCKET
-IDs most of the time--in other words, we shouldn't allow duplicate usernames, but if its the same machine trying to connect, then
-it'd be OK. I added basic support for this via a randomly generated ID on first visit (as a way of uniquely identifying a visitor)
-but it's not perfect and one could imagine spending a lot of time just on this one piece alone I think.
--->I would be very interested in feedback for ways to handle this
+-The spec didn't really mention anything about things like duplicate usernames, checking for "machine IDs", or how to handle weird
+cases like if a user was in a channel when the server 'went down' and so on. I tried to handle as many of these cases as possible
+but it is likely there are still edge cases that produce weird behavior (mostly around having a session up, killing flask, and then
+restarting flask while the session is still 'open')
+-->I would be very interested in feedback for how to get unique IDs for sockets/machines. I generated a unique ID using a simple
+random number, as I couldn't find reliable info online about a built-in socket ID to socketio
+-->I relied heavily on this SID for broadcasts targeted only at specific users
 
 -I used handlebars templates for the chatboxes,  user list, and channel list but I do realize it didn't add a TON of value since there
 wasn't much HTML...just wanted to give Handlebars a try.

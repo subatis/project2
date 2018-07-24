@@ -1,4 +1,4 @@
-// This is just to remove the (pointless and) annoying warnings in the online IDE
+// This is just to remove the annoying (and seemingly pointless) warnings in the online IDE
 // See https://stackoverflow.com/questions/38270011/varname-is-not-defined-please-fix-or-add-global-varname-cloud9
 /*global io*/
 /*global localStorage*/
@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     socket.on('connect', () => {
         // Create channel - send new channel name and username/sid of creator as well as user's current channel
         document.querySelector('.btn-create-channel').onclick = () => {
-            newChannelInput = document.querySelector('#txt-new-channel');
+            var newChannelInput = document.querySelector('#txt-new-channel');
 
             if (newChannelInput.value !== '') {
                 var newChannel = newChannelInput.value;
@@ -36,9 +36,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Set username - send username and sid
         document.querySelector('#btn-username').onclick = () => {
-            usernameInput = document.querySelector('#txt-username');
+            var usernameInput = document.querySelector('#txt-username');
+            var oldUsername = false;
+            var currentChannel = false;
 
-            socket.emit('set_username', {'username': usernameInput.value, 'sid': localStorage.getItem('sid')});
+            // Send old username (for cleanup) as well, if it exists
+            if (localStorage.getItem('username'))
+                oldUsername = localStorage.getItem('username');
+
+            // Send channel (for cleanup) as well, if it exists
+            if (localStorage.getItem('current_channel'))
+                currentChannel = localStorage.getItem('current_channel');
+
+            socket.emit('set_username', {'username': usernameInput.value, 'sid': localStorage.getItem('sid'),
+                                            'old_username': oldUsername, 'current_channel': currentChannel});
             // Clear textbox
             usernameInput.value = '';
 
@@ -47,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Send chat message - send username, channel and message
         document.querySelector('.btn-chat').onclick = () => {
-            messageInput = document.querySelector('#txt-chat-input');
+            var messageInput = document.querySelector('#txt-chat-input');
 
             // Check to ensure there is a value and process accordingly
             if (messageInput.value !== '') {
@@ -156,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 showCurrentChannelChat();
             }
 
-            // Duplicate username; hide page and alert user
+            // Duplicate or invalid username; hide page and alert user
             else {
                 document.querySelector('#main-page-body').style.visibility = 'hidden';
                 alert('Username already taken or invalid! Please choose a new alias.');
@@ -171,7 +182,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // If a username is stored from previous session, check that it is still available and set accordingly (if same user)
     if (localStorage.getItem('username')) {
-        socket.emit('set_username', {'username': localStorage.getItem('username'), 'sid': localStorage.getItem('sid')});
+        // Send current channel as well, if it exists
+        var currentChannel = false;
+        if (localStorage.getItem('current_channel'))
+            currentChannel = localStorage.getItem('current_channel');
+
+        socket.emit('set_username', {'username': localStorage.getItem('username'), 'sid': localStorage.getItem('sid'),
+                                        'old_username': false, 'current_channel': currentChannel});
     }
 
     // If no username available, hide chat area
